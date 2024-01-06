@@ -40,37 +40,6 @@ class GroupRepository extends ServiceEntityRepository
         return $this->find($id);
     }
     
-    /**
-     * @param Group $group
-     */
-    public function editGroup(Group $group): Group
-    {
-        $this->_em->persist($group);
-        $this->_em->flush();
-    }
-    
-    /**
-     * @param Group $group
-     */
-    public function deleteGroup(Group $group): void
-    {
-        $this->_em->remove($group);
-        $this->_em->flush();
-    }
-
-    /**
-     * Creates a new group.
-     *
-     * @param Group $group The group to create
-     * @return Group The created group
-     */
-    public function createGroup(Group $group): Group
-    {
-        $this->_em->persist($group);
-        $this->_em->flush();
-
-        return $group;
-    }
 }
 
     
