@@ -20,7 +20,19 @@ class GroupRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Group::class);
     }
+    
+    /**
+     * @return Group[] Returns an array of all Group objects
+     */
+    public function findAll(): array
+    {
+        return $this->createQueryBuilder('g')
+            ->getQuery()
+            ->getResult();
+    }
 
+
+    
 //    /**
 //     * @return Group[] Returns an array of Group objects
 //     */

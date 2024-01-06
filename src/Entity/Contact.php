@@ -37,7 +37,8 @@ class Contact
     private ?bool $isFavorite = null;
 
     #[ORM\ManyToOne(inversedBy: 'contacts')]
-    private ?Group $groupId = null;
+    #[ORM\JoinColumn(name:"group_id_id", referencedColumnName:"id", nullable:true)]
+    private ?Group $groupId;
 
     #[ORM\OneToMany(mappedBy: 'contact', targetEntity: AdditionalField::class, orphanRemoval: true)]
     private Collection $additionalFields;
