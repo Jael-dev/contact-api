@@ -21,28 +21,22 @@ class AdditionalFieldRepository extends ServiceEntityRepository
         parent::__construct($registry, AdditionalField::class);
     }
 
-//    /**
-//     * @return AdditionalField[] Returns an array of AdditionalField objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?AdditionalField
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+     /**
+     * @return AdditionalField[] Returns an array of all AdditionalField objects
+     */
+    public function findAll(): array
+    {
+        return $this->createQueryBuilder('g')
+            ->getQuery()
+            ->getResult();
+    }
+    
+    /**
+     * @param int $id
+     * @return AdditionalField|null Returns a AdditionalField object or null if not found
+     */
+    public function findAdditionalFieldById(int $id): ?AdditionalField
+    {
+        return $this->find($id);
+    }
 }

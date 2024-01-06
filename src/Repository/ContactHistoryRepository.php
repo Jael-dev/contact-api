@@ -20,29 +20,22 @@ class ContactHistoryRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ContactHistory::class);
     }
-
-//    /**
-//     * @return ContactHistory[] Returns an array of ContactHistory objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?ContactHistory
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+ /**
+     * @return ContactHistory[] Returns an array of all ContactHistory objects
+     */
+    public function findAll(): array
+    {
+        return $this->createQueryBuilder('g')
+            ->getQuery()
+            ->getResult();
+    }
+    
+    /**
+     * @param int $id
+     * @return ContactHistory|null Returns a ContactHistory object or null if not found
+     */
+    public function findContactHistoryById(int $id): ?ContactHistory
+    {
+        return $this->find($id);
+    }
 }
