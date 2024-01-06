@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\AdditionalFieldRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AdditionalFieldRepository::class)]
@@ -16,12 +17,15 @@ class AdditionalField
     #[ORM\Column(length: 255)]
     private ?string $fieldName = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $fieldValue = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'additionalFields')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Contact $contactId = null;
+    private ?Contact $contact = null;
+
+    #[ORM\ManyToOne(inversedBy: 'additionalFields')]
+    private ?ContactHistory $contactHistory = null;
 
     public function getId(): ?int
     {
@@ -52,14 +56,26 @@ class AdditionalField
         return $this;
     }
 
-    public function getContactId(): ?Contact
+    public function getContact(): ?Contact
     {
-        return $this->contactId;
+        return $this->contact;
     }
 
-    public function setContactId(?Contact $contactId): static
+    public function setContact(?Contact $contact): static
     {
-        $this->contactId = $contactId;
+        $this->contact = $contact;
+
+        return $this;
+    }
+
+    public function getContactHistory(): ?ContactHistory
+    {
+        return $this->contactHistory;
+    }
+
+    public function setContactHistory(?ContactHistory $contactHistory): static
+    {
+        $this->contactHistory = $contactHistory;
 
         return $this;
     }

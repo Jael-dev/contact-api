@@ -1,29 +1,69 @@
 <?php
 
+// AppFixtures.php
 
 namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use App\Entity\YourEntity;
 use Faker\Factory;
 
-class MyFixtures extends Fixture
+class AppFixtures extends Fixture
 {
+
+
     public function load(ObjectManager $manager)
     {
-        $faker = Factory::create();
+        $faker = Factory::create('fr_FR');
 
-        for ($i = 0; $i < 10; $i++) {
-            $entity = new YourEntity();
-            $entity->setProperty1($faker->word);
-            $entity->setProperty2($faker->sentence);
+        // Groups
+        // $groups = [];
+        // for ($i = 0; $i < 10; $i++) {
+        //     $entity = new Group();
+        //     $entity->setName($faker->word())
+        //     ->setDescription($faker->sentence())
+        //     ->setColor($faker->hexcolor())
+        //     ->setFavourite(mt_rand(0, 1) == 1 ? true : false);
 
-            // Ajoutez d'autres propriétés et générez des données Faker selon vos besoins
+        //     $groups[] = $entity;
+        //     $manager->persist($entity);
+        // }
 
-            $manager->persist($entity);
-        }
+        // Contacts
 
+        // $contacts = [];
+
+        // for ($i = 0; $i < 10; $i++) {
+        //     $entity = new Contact();
+        //     $entity->setFirstName($faker->firstName);
+        //     $entity->setLastName($faker->lastName);
+        //     $entity->setEmail($faker->email);
+        //     $entity->setColor($faker->hexcolor);
+        //     $entity->setPhone($faker->phoneNumber);
+        //     $entity->setBirthday($faker->dateTime);
+        //     $entity->setFavourite($faker->boolean);
+        //     $entity->setGroupId($faker->randomElement($groups));
+
+        //     $contacts[] = $entity;
+        //     $manager->persist($entity);
+        // }
+
+        // AdditionalFields
+
+        // $AdditionalFields = [];
+
+        // for ($i = 0; $i < 10; $i++) {
+        //     $entity = new AdditionalField();
+        //     $entity->setFieldName($faker->word);
+        //     $entity->setFieldValue($faker->randomElement(['text', 'number', 'date', 'email', 'url', 'tel']));
+        //     $entity->setContactId($faker->randomElement($contacts));
+
+        //     $AdditionalFields[] = $entity;
+        //     $manager->persist($entity);
+        // }
+
+
+       
         $manager->flush();
     }
 }

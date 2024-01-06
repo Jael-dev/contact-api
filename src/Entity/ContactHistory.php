@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ContactHistoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ContactHistoryRepository::class)]
@@ -18,15 +19,19 @@ class ContactHistory
     #[ORM\Column(length: 255)]
     private ?string $operationName = null;
 
-    #[ORM\OneToMany(mappedBy: 'contactHistory', targetEntity: Contact::class)]
-    private Collection $contactId;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $timestamp = null;
 
-    #[ORM\ManyToOne]
-    private ?AdditionalField $additionalField = null;
+    #[ORM\ManyToOne(inversedBy: 'contactHistories')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Contact $contact = null;
+
+    #[ORM\OneToMany(mappedBy: 'contactHistory', targetEntity: AdditionalField::class)]
+    private Collection $additionalFields;
 
     public function __construct()
     {
-        $this->contactId = new ArrayCollection();
+        $this->additionalFields = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -46,44 +51,56 @@ class ContactHistory
         return $this;
     }
 
-    /**
-     * @return Collection<int, Contact>
-     */
-    public function getContactId(): Collection
+    public function getTimestamp(): ?\DateTimeInterface
     {
-        return $this->contactId;
+        return $this->timestamp;
     }
 
-    public function addContactId(Contact $contactId): static
+    public function setTimestamp(\DateTimeInterface $timestamp): static
     {
-        if (!$this->contactId->contains($contactId)) {
-            $this->contactId->add($contactId);
-            $contactId->setContactHistory($this);
+        $this->timestamp = $timestamp;
+
+        return $this;
+    }
+
+    public function getContact(): ?Contact
+    {
+        return $this->contact;
+    }
+
+    public function setContact(?Contact $contact): static
+    {
+        $this->contact = $contact;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AdditionalField>
+     */
+    public function getAdditionalFields(): Collection
+    {
+        return $this->additionalFields;
+    }
+
+    public function addAdditionalField(AdditionalField $additionalField): static
+    {
+        if (!$this->additionalFields->contains($additionalField)) {
+            $this->additionalFields->add($additionalField);
+            $additionalField->setContactHistory($this);
         }
 
         return $this;
     }
 
-    public function removeContactId(Contact $contactId): static
+    public function removeAdditionalField(AdditionalField $additionalField): static
     {
-        if ($this->contactId->removeElement($contactId)) {
+        if ($this->additionalFields->removeElement($additionalField)) {
             // set the owning side to null (unless already changed)
-            if ($contactId->getContactHistory() === $this) {
-                $contactId->setContactHistory(null);
+            if ($additionalField->getContactHistory() === $this) {
+                $additionalField->setContactHistory(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getAdditionalField(): ?AdditionalField
-    {
-        return $this->additionalField;
-    }
-
-    public function setAdditionalField(?AdditionalField $additionalField): static
-    {
-        $this->additionalField = $additionalField;
 
         return $this;
     }

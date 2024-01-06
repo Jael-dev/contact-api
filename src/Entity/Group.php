@@ -27,7 +27,7 @@ class Group
     private ?string $color = null;
 
     #[ORM\Column]
-    private ?bool $favourite = null;
+    private ?bool $isFavorite = null;
 
     #[ORM\OneToMany(mappedBy: 'groupId', targetEntity: Contact::class)]
     private Collection $contacts;
@@ -78,14 +78,14 @@ class Group
         return $this;
     }
 
-    public function isFavourite(): ?bool
+    public function isIsFavorite(): ?bool
     {
-        return $this->favourite;
+        return $this->isFavorite;
     }
 
-    public function setFavourite(bool $favourite): static
+    public function setIsFavorite(bool $isFavorite): static
     {
-        $this->favourite = $favourite;
+        $this->isFavorite = $isFavorite;
 
         return $this;
     }

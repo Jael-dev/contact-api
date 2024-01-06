@@ -3,7 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ContactRepository;
-use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ContactRepository::class)]
@@ -20,23 +21,35 @@ class Contact
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastName = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $phoneNumber = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $color = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $photo = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $birthday = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $birthdate = null;
 
     #[ORM\Column]
-    private ?bool $favourite = null;
+    private ?bool $isFavorite = null;
 
     #[ORM\ManyToOne(inversedBy: 'contacts')]
     private ?Group $groupId = null;
 
-    #[ORM\ManyToOne(inversedBy: 'contactId')]
-    private ?ContactHistory $contactHistory = null;
+    #[ORM\OneToMany(mappedBy: 'contact', targetEntity: AdditionalField::class, orphanRemoval: true)]
+    private Collection $additionalFields;
+
+    #[ORM\OneToMany(mappedBy: 'contact', targetEntity: ContactHistory::class, orphanRemoval: true)]
+    private Collection $contactHistories;
+
+    public function __construct()
+    {
+        $this->additionalFields = new ArrayCollection();
+        $this->contactHistories = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -67,6 +80,18 @@ class Contact
         return $this;
     }
 
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber(string $phoneNumber): static
+    {
+        $this->phoneNumber = $phoneNumber;
+
+        return $this;
+    }
+
     public function getEmail(): ?string
     {
         return $this->email;
@@ -79,38 +104,38 @@ class Contact
         return $this;
     }
 
-    public function getColor(): ?string
+    public function getPhoto(): ?string
     {
-        return $this->color;
+        return $this->photo;
     }
 
-    public function setColor(string $color): static
+    public function setPhoto(?string $photo): static
     {
-        $this->color = $color;
+        $this->photo = $photo;
 
         return $this;
     }
 
-    public function getBirthday(): ?\DateTimeInterface
+    public function getBirthdate(): ?string
     {
-        return $this->birthday;
+        return $this->birthdate;
     }
 
-    public function setBirthday(?\DateTimeInterface $birthday): static
+    public function setBirthdate(?string $birthdate): static
     {
-        $this->birthday = $birthday;
+        $this->birthdate = $birthdate;
 
         return $this;
     }
 
-    public function isFavourite(): ?bool
+    public function isIsFavorite(): ?bool
     {
-        return $this->favourite;
+        return $this->isFavorite;
     }
 
-    public function setFavourite(bool $favourite): static
+    public function setIsFavorite(bool $isFavorite): static
     {
-        $this->favourite = $favourite;
+        $this->isFavorite = $isFavorite;
 
         return $this;
     }
@@ -127,14 +152,62 @@ class Contact
         return $this;
     }
 
-    public function getContactHistory(): ?ContactHistory
+    /**
+     * @return Collection<int, AdditionalField>
+     */
+    public function getAdditionalFields(): Collection
     {
-        return $this->contactHistory;
+        return $this->additionalFields;
     }
 
-    public function setContactHistory(?ContactHistory $contactHistory): static
+    public function addAdditionalField(AdditionalField $additionalField): static
     {
-        $this->contactHistory = $contactHistory;
+        if (!$this->additionalFields->contains($additionalField)) {
+            $this->additionalFields->add($additionalField);
+            $additionalField->setContact($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAdditionalField(AdditionalField $additionalField): static
+    {
+        if ($this->additionalFields->removeElement($additionalField)) {
+            // set the owning side to null (unless already changed)
+            if ($additionalField->getContact() === $this) {
+                $additionalField->setContact(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ContactHistory>
+     */
+    public function getContactHistories(): Collection
+    {
+        return $this->contactHistories;
+    }
+
+    public function addContactHistory(ContactHistory $contactHistory): static
+    {
+        if (!$this->contactHistories->contains($contactHistory)) {
+            $this->contactHistories->add($contactHistory);
+            $contactHistory->setContact($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContactHistory(ContactHistory $contactHistory): static
+    {
+        if ($this->contactHistories->removeElement($contactHistory)) {
+            // set the owning side to null (unless already changed)
+            if ($contactHistory->getContact() === $this) {
+                $contactHistory->setContact(null);
+            }
+        }
 
         return $this;
     }
