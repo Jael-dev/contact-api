@@ -31,62 +31,86 @@ class GroupController extends AbstractController
         
     }
 
-    #[Route('/new', name: 'app_group_new', methods: ['GET', 'POST'])]
+    // Create a new group
+
+    #[Route('/', name: 'app_group_new', methods: ['POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $data = json_decode($request->getContent(), true);
+
         $group = new Group();
-        $form = $this->createForm(GroupType::class, $group);
-        $form->handleRequest($request);
+        $group->setName($data['name']);
+        $group->setDescription($data['description']);
+        $group->setColor($data['color']);
+        $group->setIsFavorite($data['isFavorite']);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($group);
-            $entityManager->flush();
+        $entityManager->persist($group);
+        $entityManager->flush();
 
-            return $this->redirectToRoute('app_group_index', [], Response::HTTP_SEE_OTHER);
-        }
+        $data = $this->serializeGroup($group);
 
-        return $this->render('group/new.html.twig', [
-            'group' => $group,
-            'form' => $form,
-        ]);
+        return $this->json($data, 201);
     }
+
+    // Get a group
 
     #[Route('/{id}', name: 'app_group_show', methods: ['GET'])]
-    public function show(Group $group): Response
+    public function show( int $id, GroupRepository $groupRepository, Request $request): Response
     {
-        return $this->render('group/show.html.twig', [
-            'group' => $group,
-        ]);
-    }
+        $group = $groupRepository->findGroupById($id);
 
-    #[Route('/{id}/edit', name: 'app_group_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Group $group, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(GroupType::class, $group);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_group_index', [], Response::HTTP_SEE_OTHER);
+        if (!$group) {
+            return $this->json(['message' => 'Groupe non trouvé'], 404);
         }
 
-        return $this->render('group/edit.html.twig', [
-            'group' => $group,
-            'form' => $form,
-        ]);
+        $data = $this->serializeGroup($group);
+
+        return $this->json($data);
     }
 
-    #[Route('/{id}', name: 'app_group_delete', methods: ['POST'])]
-    public function delete(Request $request, Group $group, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: 'app_group_edit', methods: ['PUT'])]
+    public function edit(Request $request,  GroupRepository $groupRepository, EntityManagerInterface $entityManager, int $id): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$group->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($group);
-            $entityManager->flush();
+        $group = $groupRepository->findGroupById($id);
+
+        if (!$group) {
+            return $this->json(['message' => 'Groupe non trouvé'], 404);
         }
 
-        return $this->redirectToRoute('app_group_index', [], Response::HTTP_SEE_OTHER);
+        $data = json_decode($request->getContent(), true);
+
+        $group->setName($data['name']);
+        $group->setDescription($data['description']);
+        $group->setColor($data['color']);
+        $group->setIsFavorite($data['isFavorite']);
+
+        $entityManager->persist($group);
+        $entityManager->flush();
+
+        $data = $this->serializeGroup($group);
+
+        return $this->json($data);
     }
+
+
+    // Delete a group
+    #[Route('/{id}', name: 'app_group_delete', methods: ['DELETE'])]
+    public function delete(GroupRepository $groupRepository, EntityManagerInterface $entityManager, int $id): Response
+    {
+        $group = $groupRepository->findGroupById($id);
+
+        if (!$group) {
+            return $this->json(['message' => 'Groupe non trouvé'], 404);
+        }
+
+        $entityManager->persist($group);
+        $entityManager->remove($group);
+        $entityManager->flush();
+
+        return $this->json(['message' => 'Groupe supprimé avec succès']);
+    }
+
+    // Serialize a group
 
     private function serializeGroup(Group $group): array
     {
@@ -96,7 +120,6 @@ class GroupController extends AbstractController
             'description' => $group->getDescription(),
             'color' => $group->getColor(),
             'isFavorite' => $group->isIsFavorite(),
-            // Ajoutez d'autres champs si nécessaire
         ];
     }
 }

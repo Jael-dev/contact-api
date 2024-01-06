@@ -30,31 +30,47 @@ class GroupRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    
+    /**
+     * @param int $id
+     * @return Group|null Returns a Group object or null if not found
+     */
+    public function findGroupById(int $id): ?Group
+    {
+        return $this->find($id);
+    }
+    
+    /**
+     * @param Group $group
+     */
+    public function editGroup(Group $group): Group
+    {
+        $this->_em->persist($group);
+        $this->_em->flush();
+    }
+    
+    /**
+     * @param Group $group
+     */
+    public function deleteGroup(Group $group): void
+    {
+        $this->_em->remove($group);
+        $this->_em->flush();
+    }
 
+    /**
+     * Creates a new group.
+     *
+     * @param Group $group The group to create
+     * @return Group The created group
+     */
+    public function createGroup(Group $group): Group
+    {
+        $this->_em->persist($group);
+        $this->_em->flush();
+
+        return $group;
+    }
+}
 
     
-//    /**
-//     * @return Group[] Returns an array of Group objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('g')
-//            ->andWhere('g.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('g.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Group
-//    {
-//        return $this->createQueryBuilder('g')
-//            ->andWhere('g.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
-}
