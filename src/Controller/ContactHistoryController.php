@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\ContactHistory;
+use App\Entity\Contact;
 use App\Repository\ContactHistoryRepository;
+use App\Repository\ContactRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,17 +30,16 @@ class ContactHistoryController extends AbstractController
     }
 
     #[Route('/', name: 'app_contact_history_new', methods: ['POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, int $id): Response
     {
         $data = json_decode($request->getContent(), true);
 
         $contactHistory = new ContactHistory();
-        $contactHistory->setOperationName($data['operationName']);
+        $contactHistory->setOperationName('Created on ');
         $contactHistory->setTimestamp(new \DateTime($data['timestamp']));
-        // Add more fields as needed
+       
 
-        // Assuming $data['contactId'] is the ID of the associated Contact
-        $contact = $entityManager->getRepository(Contact::class)->find($data['contactId']);
+        $contact = $entityManager->getRepository(Contact::class)->findContactById($id);
         if (!$contact) {
             return $this->json(['message' => 'Contact not found'], 404);
         }
@@ -53,21 +54,56 @@ class ContactHistoryController extends AbstractController
         return $this->json($data, 201);
     }
 
-    #[Route('/{id}', name: 'app_contact_history_show', methods: ['GET'])]
-    public function show(int $id, ContactHistoryRepository $contactHistoryRepository): Response
+    #[Route('/update', name: 'app_contact_history_new', methods: ['POST'])]
+    public function update(Request $request, EntityManagerInterface $entityManager, int $id): Response
     {
-        $contactHistory = $contactHistoryRepository->find($id);
+        $data = json_decode($request->getContent(), true);
 
-        if (!$contactHistory) {
-            return $this->json(['message' => 'Contact history not found'], 404);
+        $contactHistory = new ContactHistory();
+        $contactHistory->setOperationName('Updated on ');
+        $contactHistory->setTimestamp(new \DateTime($data['timestamp']));
+       
+
+        $contact = $entityManager->getRepository(Contact::class)->findContactById($id);
+        if (!$contact) {
+            return $this->json(['message' => 'Contact not found'], 404);
         }
+
+        $contactHistory->setContact($contact);
+
+        $entityManager->persist($contactHistory);
+        $entityManager->flush();
 
         $data = $this->serializeContactHistory($contactHistory);
 
-        return $this->json($data);
+        return $this->json($data, 201);
     }
 
-    // Add routes for editing and deleting contact histories if needed
+    #[Route('/delete', name: 'app_contact_history_new', methods: ['DELETE'])]
+
+
+    // todo: delete contact history
+    public function delete(Request $request, EntityManagerInterface $entityManager, int $id): Response
+    {
+        $contactHistory = $contactHistoryRepository->findContactHistoryById($id);
+
+        if (!$contactHistory) {
+            return $this->json(['message' => 'ContactHistory non trouvé'], 404);
+        }
+
+
+        $entityManager->persist($contactHistory);
+        $entityManager->remove($contactHistory);
+        $entityManager->flush();
+
+        return $this->json(['message' => 'ContactHistory supprimé avec succès']);
+
+    }
+
+  
+
+
+    // Add routes for editing and deleting contact histories 
 
     private function serializeContactHistory(ContactHistory $contactHistory): array
     {
@@ -79,7 +115,7 @@ class ContactHistoryController extends AbstractController
                 'id' => $contactHistory->getContact()->getId(),
                 'firstName' => $contactHistory->getContact()->getFirstName(),
                 'lastName' => $contactHistory->getContact()->getLastName(),
-                // Add more fields as needed
+                
             ],
             'additionalFields' => $this->serializeAdditionalFields($contactHistory->getAdditionalFields()),
         ];

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\ContactHistory;
 
 #[Route('/contact')]
 class ContactController extends AbstractController
@@ -32,8 +33,9 @@ class ContactController extends AbstractController
     }
 
     // Create a new contact
+    
 
-    #[Route('/', name: 'app_contact_new', methods: ['POST'])]
+    #[Route('/',  methods: ['POST'])]
 
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -52,6 +54,8 @@ class ContactController extends AbstractController
         $entityManager->flush();
 
         $data = $this->serializeContact($contact);
+
+        $this->createContactHistory($contact, 'Contact Created',$entityManager);
 
         return $this->json($data, 201);
     }
@@ -101,6 +105,7 @@ class ContactController extends AbstractController
         $entityManager->flush();
 
         $data = $this->serializeContact($contact);
+        $this->createContactHistory($contact, 'Contact Updated',$entityManager);
 
         return $this->json($data);
     }
@@ -157,4 +162,15 @@ class ContactController extends AbstractController
 
     return $result;
 }
+
+private function createContactHistory(Contact $contact, string $operationName, EntityManagerInterface $entityManager): void
+    {
+        $contactHistory = new ContactHistory();
+        $contactHistory->setOperationName($operationName);
+        $contactHistory->setTimestamp(new \DateTime());
+        $contactHistory->setContact($contact);
+
+        $entityManager->persist($contactHistory);
+        $entityManager->flush();
+    }
 }
