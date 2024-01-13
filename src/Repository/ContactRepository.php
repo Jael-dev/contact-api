@@ -46,7 +46,7 @@ class ContactRepository extends ServiceEntityRepository
     public function findByGroupId(int $id): array
     {
         return $this->createQueryBuilder('g')
-            ->andWhere('g.group_id = :val')
+            ->andWhere('g.groupId = :val')
             ->setParameter('val', $id)
             ->orderBy('g.id', 'ASC')
             ->getQuery()
@@ -54,7 +54,81 @@ class ContactRepository extends ServiceEntityRepository
         ;
     }
 
-    // /**
+    // search in all fields
 
+    /**
+     * @return Contact[] Returns an array of Contact objects
+     */
+
+    public function search(string $search): array
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.first_name LIKE :val')
+            ->orWhere('g.last_name LIKE :val')
+            ->orWhere('g.phone_number LIKE :val')
+            ->orWhere('g.email LIKE :val')
+            ->orWhere('g.photo LIKE :val')
+            ->orWhere('g.birthdate LIKE :val')
+            ->orWhere('g.is_favorite LIKE :val')
+            ->orWhere('g.group_id LIKE :val')
+            ->setParameter('val', '%'.$search.'%')
+            ->orderBy('g.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    // search in all fields
+
+    /**
+     * @return Contact[] Returns an array of Contact objects
+     */
+
+    public function searchByGroupId(string $search, int $id): array
+
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.first_name LIKE :val')
+            ->orWhere('g.last_name LIKE :val')
+            ->orWhere('g.phone_number LIKE :val')
+            ->orWhere('g.email LIKE :val')
+            ->orWhere('g.photo LIKE :val')
+            ->orWhere('g.birthdate LIKE :val')
+            ->orWhere('g.is_favorite LIKE :val')
+            ->orWhere('g.group_id LIKE :val')
+            ->andWhere('g.group_id = :val2')
+            ->setParameter('val', '%'.$search.'%')
+            ->setParameter('val2', $id)
+            ->orderBy('g.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+
+    // search in all fields and additional fields
+
+    /**
+     * @return Contact[] Returns an array of Contact objects
+     */
+
+    public function searchWithAdditionalFields(string $search): array
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.first_name LIKE :val')
+            ->orWhere('g.last_name LIKE :val')
+            ->orWhere('g.phone_number LIKE :val')
+            ->orWhere('g.email LIKE :val')
+            ->orWhere('g.photo LIKE :val')
+            ->orWhere('g.birthdate LIKE :val')
+            ->orWhere('g.is_favorite LIKE :val')
+            ->orWhere('g.group_id LIKE :val')
+            ->orWhere('g.additional_fields LIKE :val')
+            ->setParameter('val', '%'.$search.'%')
+            ->orderBy('g.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
  
 }
