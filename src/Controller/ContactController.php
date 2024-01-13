@@ -130,6 +130,22 @@ class ContactController extends AbstractController
         return $this->json(['message' => 'Contact supprimé avec succès']);
     }
 
+    // Get the list of contacts by groupid
+
+    #[Route('/group/{id}',  methods: ['GET'])]
+
+    public function findByGroupId(ContactRepository $contactRepository, int $id): Response
+    {
+        $contacts = $contactRepository->findByGroupId($id);
+        $data = [];
+
+        foreach ($contacts as $contact) {
+            $data[] = $this->serializeContact($contact);
+        }
+
+        return $this->json($data);
+    }
+
     // Serialize a contact
 
     private function serializeContact(Contact $contact): array

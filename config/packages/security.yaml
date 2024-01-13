@@ -1,0 +1,15 @@
+
+security:
+    # ...
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+
+        your_firewall:
+            pattern: ^/
+            methods: [OPTIONS, GET, POST, PUT, DELETE]
+    

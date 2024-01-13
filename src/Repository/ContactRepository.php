@@ -39,5 +39,22 @@ class ContactRepository extends ServiceEntityRepository
         return $this->find($id);
     }
 
+    // Find by groupid
+    /**
+     * @return Contact[] Returns an array of Contact objects
+     */      
+    public function findByGroupId(int $id): array
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.group_id = :val')
+            ->setParameter('val', $id)
+            ->orderBy('g.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    // /**
+
  
 }
